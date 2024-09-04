@@ -1,0 +1,52 @@
+﻿<Window
+    x:Class="Extraordinary.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Extraordinary.App"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:Extraordinary.App.ViewModels"
+    Width="800"
+    Height="600"
+    d:DataContext="{d:DesignInstance Type=vms:AppViewModel}"
+    Closed="Window_Closed"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <Window.Title>
+        <MultiBinding StringFormat="{}{0} ({1})">
+            <Binding Source="{StaticResource AppName}" />
+        </MultiBinding>
+    </Window.Title>
+
+    <DockPanel
+        Name="main"
+        Background="#F9F9F9"
+        LastChildFill="True">
+        <StackPanel DockPanel.Dock="Top">
+            <Grid Height="80">
+                <Grid.Background>
+                    <SolidColorBrush Color="#FF1E3853" />
+                </Grid.Background>
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="32px"
+                    FontWeight="Bold"
+                    Foreground="White"
+                    Text="{Binding AppTitle.Value}" />
+            </Grid>
+        </StackPanel>
+        <Frame
+            Name="navWin"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch"
+            Background="#FF1E3853"
+            DockPanel.Dock="Left"
+            NavigationUIVisibility="Hidden"
+            ScrollViewer.HorizontalScrollBarVisibility="Visible"
+            ScrollViewer.VerticalScrollBarVisibility="Visible" />
+    </DockPanel>
+</Window>

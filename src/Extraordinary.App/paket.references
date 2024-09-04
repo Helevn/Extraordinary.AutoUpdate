@@ -1,0 +1,11 @@
+MediatR
+ReactiveProperty.WPF
+HandyControl
+Microsoft.Extensions.Hosting
+Microsoft.Extensions.Hosting.Abstractions
+Microsoft.Extensions.Options
+Microsoft.Extensions.Options.ConfigurationExtensions
+Microsoft.AspNetCore.DataProtection
+MediatR.Extensions.Microsoft.DependencyInjection
+System.Text.Encoding.CodePages
+Newtonsoft.Json

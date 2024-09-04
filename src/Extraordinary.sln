@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34723.18
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extraordinary.App", "Extraordinary.App\Extraordinary.App.csproj", "{7AC32CDA-F374-4E7D-A2F3-F3A27A740446}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{3F69194A-7546-43A6-9CDE-7949D1FE4607}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+		paket.dependencies = paket.dependencies
+		paket.lock = paket.lock
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7AC32CDA-F374-4E7D-A2F3-F3A27A740446}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AC32CDA-F374-4E7D-A2F3-F3A27A740446}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AC32CDA-F374-4E7D-A2F3-F3A27A740446}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AC32CDA-F374-4E7D-A2F3-F3A27A740446}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {340FDADE-C1AD-4709-AAB2-6150562668B1}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,37 @@
+source https://baget.stdunit.com/v3/index.json
+source https://api.nuget.org/v3/index.json
+cache ./nuget-package-caches
+
+storage: none
+strategy: min
+
+nuget Microsoft.Extensions.Hosting >= 6.0
+nuget Microsoft.Extensions.Options >= 6.0
+nuget Microsoft.Extensions.Options.ConfigurationExtensions >= 6.0
+nuget Microsoft.AspNetCore.DataProtection >= 6.0
+nuget Microsoft.Extensions.Http >= 6.0
+nuget Microsoft.Win32.Registry 5.0.0   
+nuget Microsoft.Xaml.Behaviors.Wpf 1.1.39  
+nuget Microsoft.EntityFrameworkCore.Sqlite >= 6.0
+nuget MahApps.Metro 2.0.0  
+nuget MediatR 9.0.0 
+nuget MediatR.Extensions.Microsoft.DependencyInjection 9.0.0 
+nuget Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson  >= 6.0
+
+nuget System.ComponentModel 4.3.0  
+nuget System.ComponentModel.Annotations 5.0.0  
+nuget System.Text.Encoding.CodePages 7.0.0 
+nuget System.Text.Encodings.Web >= 6.0.0  
+nuget System.Text.Json >= 8.0.0
+nuget System.Threading.Tasks.Extensions 4.5.4  
+nuget System.ValueTuple 4.5.0  
+nuget StdUnit.Sharp7.Options 0.5.7
+nuget Swashbuckle.AspNetCore
+nuget Swashbuckle.AspNetCore.Newtonsoft
+
+nuget IronPython 3.4.1
+
+nuget HandyControl
+
+nuget ReactiveProperty
+nuget ReactiveProperty.WPF
