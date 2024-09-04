@@ -31,6 +31,7 @@ namespace Extraordinary.App.ViewModels
             this.CurrentMD5Version = new ReactiveProperty<string>();
             this.InstallationPath = new ReactiveProperty<string>();
             this.Self_Starting = new ReactiveProperty<bool>();
+            this.Kill_App = new ReactiveProperty<bool>();
 
             this.ProgressMaxValue = new ReactiveProperty<long>(long.MaxValue);
             this.ProgressValue = new ReactiveProperty<long>(0);
@@ -120,7 +121,8 @@ namespace Extraordinary.App.ViewModels
                         DownloadPath = this.DownloadPath.Value,
                         CurrentMD5Version = this.CurrentMD5Version.Value,
                         InstallationPath = this.InstallationPath.Value,
-                        Self_Starting = this.Self_Starting.Value
+                        Self_Starting = this.Self_Starting.Value,
+                        Kill_App = this.Kill_App.Value,
                     };
                     await _fileServices.SaveConfigAsync(config, this.UpdateConfigFilePath);
                     this.Refresh(config);
@@ -206,6 +208,7 @@ namespace Extraordinary.App.ViewModels
             this.CurrentMD5Version.Value = config.CurrentMD5Version;
             this.InstallationPath.Value = config.InstallationPath;
             this.Self_Starting.Value = config.Self_Starting;
+            this.Kill_App.Value = config.Kill_App;
         }
         public void RefreshProgressBar(string action, long maxVaue, long value)
         {
@@ -234,6 +237,7 @@ namespace Extraordinary.App.ViewModels
         public ReactiveProperty<string> CurrentMD5Version { get; set; }
         public ReactiveProperty<string> InstallationPath { get; set; }
         public ReactiveProperty<bool> Self_Starting { get; set; }
+        public ReactiveProperty<bool> Kill_App { get; set; }
 
 
         public ReactiveProperty<long> ProgressMaxValue { get; set; }

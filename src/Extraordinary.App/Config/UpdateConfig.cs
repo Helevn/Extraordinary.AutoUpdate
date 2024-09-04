@@ -24,8 +24,13 @@
         public string InstallationPath { get; set; } = "";
 
         /// <summary>
-        /// 自启动
+        /// 自运行
         /// </summary>
-        public bool Self_Starting { get; set; } = true;
+        public bool Self_Starting { get; set; } = false;
+
+        /// <summary>
+        /// 可终止App运行
+        /// </summary>
+        public bool Kill_App { get; set; } = false;
     }
 }
