@@ -204,10 +204,15 @@ namespace Extraordinary.App.Services
 
         public async Task KillProcessAsync(string processName)
         {
-            foreach (var p in Process.GetProcessesByName(processName))
+            processName = Path.GetFileNameWithoutExtension(processName);
+            var ps = Process.GetProcesses();
+            foreach (var p in ps)
             {
-                p.Kill();
-                await p.WaitForExitAsync(); // possibly with a timeout
+                if (p.ProcessName.Contains(processName))
+                {
+                    p.Kill();
+                    await p.WaitForExitAsync(); // possibly with a timeout
+                }
             }
         }
 
