@@ -82,8 +82,13 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
+                <Label Content="更新前终止" />
+                <CheckBox x:Name="checkBox_Kill_App" IsChecked="{Binding Kill_App.Value}" />
+            </StackPanel>
+            
+            <StackPanel Orientation="Horizontal">
                 <Label Content="自动运行" />
-                <CheckBox x:Name="text_Self_Starting" IsChecked="{Binding Self_Starting.Value}" />
+                <CheckBox x:Name="checkBox_Self_Starting" IsChecked="{Binding Self_Starting.Value}" />
             </StackPanel>
         </StackPanel>
 

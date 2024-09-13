@@ -3,12 +3,14 @@ using Extraordinary.App.MessageHandler;
 using Extraordinary.App.Respone;
 using MediatR;
 using Newtonsoft.Json;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Extraordinary.App.Services
 {
@@ -22,13 +24,13 @@ namespace Extraordinary.App.Services
 
         public async Task<ResponeReturn<string>> UpdateAsync(string updateConfigFilePath, string urlConfigName, Func<UpdateConfig, string>? func = null)
         {
-            var r1 = await this.GetConfigAsync<UpdateConfig>(updateConfigFilePath);
+            var r1 = await this.GetConfigAsync<UpdateConfig>(updateConfigFilePath);//读本地配置文件
             if (!r1.Succeed)
                 return r1.ErrorValue.ToErrorResult<string>();
             var tempPath = Path.GetTempPath();
 
             var updateConfig = r1.ResultValue;
-            var r2 = await this.DownloadAppAsync(updateConfig.ServerUrl, urlConfigName, tempPath);
+            var r2 = await this.DownloadAppAsync(updateConfig.ServerUrl, urlConfigName, tempPath);//访问服务端配置文件
             if (!r2.Succeed)
                 return r2.ErrorValue.ToErrorResult<string>();
 
@@ -39,50 +41,47 @@ namespace Extraordinary.App.Services
 
             var urlconfig = r3.ResultValue;
 
-            var needUpdate = updateConfig.CurrentMD5Version != urlconfig.AppMD5Version;
+            var needUpdate = updateConfig.CurrentMD5Version != urlconfig.AppMD5Version;//判断更新情况
             if (needUpdate)
             {
-                var r4 = await this.DownloadAppAsync(updateConfig.ServerUrl, urlconfig.PackageName, updateConfig.DownloadPath);
+                var r4 = await this.DownloadAppAsync(updateConfig.ServerUrl, urlconfig.PackageName, updateConfig.DownloadPath);//下载更新程序
                 if (!r4.Succeed)
                     return r4.ErrorValue.ToErrorResult<string>();
 
                 var appPath = r4.ResultValue;
-                var r5 = await this.CompareFileAsync(appPath, urlconfig.AppMD5Version);
+                var r5 = await this.CompareFileAsync(appPath, urlconfig.AppMD5Version);//文件完整性比对
                 if (!r5.Succeed)
                     return r5.ErrorValue.ToErrorResult<string>();
 
+                if (updateConfig.Kill_App)
+                    await this.KillProcessAsync(updateConfig.AppName);//杀死当前进程
+
                 var compare = r5.ResultValue;
-                var r6 = await this.UnCompressAsync(appPath, updateConfig.InstallationPath);
+                var r6 = await this.UnCompressAsync(appPath, updateConfig.InstallationPath);//解压
                 if (!r6.Succeed)
                     return r6.ErrorValue.ToErrorResult<string>();
 
                 var installPath = r6.ResultValue;
-                var r7 = await this.StartProcessAsync(installPath, updateConfig.AppName);
+                var r7 = await this.StartProcessAsync(installPath, updateConfig.AppName);//启动
                 if (!r7.Succeed)
                     return r7.ErrorValue.ToErrorResult<string>();
 
-                var config = new UpdateConfig
-                {
-                    ServerUrl = updateConfig.ServerUrl,
-                    AppName = updateConfig.AppName,
-                    DownloadPath = updateConfig.DownloadPath,
-                    CurrentMD5Version = compare,
-                    InstallationPath = updateConfig.InstallationPath,
-                    Self_Starting = updateConfig.Self_Starting
-                };
-
-                var r8 = await SaveConfigAsync(config, updateConfigFilePath);
+                updateConfig.CurrentMD5Version = compare;
+                var r8 = await SaveConfigAsync(updateConfig, updateConfigFilePath);//保存MD5信息
                 if (!r8.Succeed)
                     return r8.ErrorValue.ToErrorResult<string>();
 
                 if (func != null)
-                    func(config);
+                    func(updateConfig);
 
                 return "程序更新成功".ToOkResult();
             }
             else
             {
-                var r10 = await this.StartProcessAsync(updateConfig.InstallationPath, updateConfig.AppName);
+                if (updateConfig.Kill_App)
+                    await this.KillProcessAsync(updateConfig.AppName);//杀死当前进程
+
+                var r10 = await this.StartProcessAsync(updateConfig.InstallationPath, updateConfig.AppName);//启动
                 if (!r10.Succeed)
                     return r10.ErrorValue.ToErrorResult<string>();
                 return "程序已经是最新的".ToOkResult();
@@ -201,6 +200,20 @@ namespace Extraordinary.App.Services
             }
             await _mediator.Publish(ProgressBarINotification.Max("程序启动"));
             return true.ToOkResult();
+        }
+
+        public async Task KillProcessAsync(string processName)
+        {
+            processName = Path.GetFileNameWithoutExtension(processName);
+            var ps = Process.GetProcesses();
+            foreach (var p in ps)
+            {
+                if (p.ProcessName.Contains(processName))
+                {
+                    p.Kill();
+                    await p.WaitForExitAsync(); // possibly with a timeout
+                }
+            }
         }
 
         public async Task<ResponeReturn<string>> GetFileMD5HashAsync(string filePath)

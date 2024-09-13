@@ -14,5 +14,6 @@ namespace Extraordinary.App.Services
         Task<ResponeReturn<T>> GetConfigAsync<T>(string filePath);
         Task<ResponeReturn<T>> SaveConfigAsync<T>(T config, string filePath);
         Task<ResponeReturn<string>> CompareFileAsync(string filePath, string md5Version);
+        Task KillProcessAsync(string processName);
     }
 }
