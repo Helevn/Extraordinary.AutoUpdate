@@ -1,6 +1,4 @@
-$DIST_Client = "../dist/Extraordinary.App"
-
-$DIST_FILE = "../release/Extraordinary.App.zip"
+$DIST_Client = "dist/Extraordinary.App"
 
 Get-ChildItem -Path . -Directory -Filter "bin" -Recurse | ForEach-Object { 
     Remove-Item -Path $_.FullName -Recurse -Force 
@@ -14,30 +12,34 @@ Get-ChildItem -Path . -Directory -Filter "paket-files" | ForEach-Object {
     Remove-Item -Path $_.FullName -Recurse -Force 
 }
 
-dotnet restore
+Remove-Item -Path "dist" -Recurse
+
+dotnet restore src\Extraordinary.sln
 if ($LASTEXITCODE -ne 0) {
     throw ;
 }
 
-dotnet build 
+dotnet build src\Extraordinary.sln
 if ($LASTEXITCODE -ne 0) {
     throw ;
 }
 
-dotnet publish .\Extraordinary.App\Extraordinary.App.csproj -c Release -f net6.0-windows10.0.17763.0 --runtime win-x64 --self-contained false -o $DIST_Client
+dotnet publish src\Extraordinary.App\Extraordinary.App.csproj `
+    -c Release `
+    -f net8.0-windows10.0.17763.0 `
+    --runtime win-x64 `
+    --self-contained false `
+    -p:PublishSingleFile=true `
+    -p:IncludeNativeLibrariesForSelfExtract=true `
+    -p:IncludeAppHostInSingleFile=true `
+    -p:DebugType=None `
+    -p:DebugSymbols=false `
+    -o $DIST_Client
+
 if ($LASTEXITCODE -ne 0) {
     throw ;
 }
-
-$Exist=Test-Path "../release" 
-if($Exist -ne "True")
-{
-    New-Item -Path "../release" -type directory
-}
-
-Compress-Archive -Path $DIST_Client -DestinationPath $DIST_FILE -Force
-Remove-Item -Path "../dist" -Recurse
 
 Write-Host "app is published: " -NoNewline -ForegroundColor Green
-Write-Host $DIST_FILE -ForegroundColor Blue
+Write-Host $DIST_Client -ForegroundColor Blue
 
