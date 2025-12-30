@@ -23,6 +23,12 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="Width" Value="200" />
             </Style>
+            
+            <Style TargetType="CheckBox">
+                <Setter Property="FontSize" Value="24" />
+                <Setter Property="FontFamily" Value="NSimSun" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
 
             <Style TargetType="TextBlock">
                 <Setter Property="FontSize" Value="24" />
@@ -82,13 +88,11 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-                <Label Content="更新前终止" />
-                <CheckBox x:Name="checkBox_Kill_App" IsChecked="{Binding Kill_App.Value}" />
+                <CheckBox x:Name="checkBox_Kill_App" IsChecked="{Binding Kill_App.Value}" Content="更新前终止运行程序"/>
             </StackPanel>
             
             <StackPanel Orientation="Horizontal">
-                <Label Content="自动运行" />
-                <CheckBox x:Name="checkBox_Self_Starting" IsChecked="{Binding Self_Starting.Value}" />
+                <CheckBox x:Name="checkBox_Self_Starting" IsChecked="{Binding Self_Starting.Value}" Content="自动运行"/>
             </StackPanel>
         </StackPanel>
 

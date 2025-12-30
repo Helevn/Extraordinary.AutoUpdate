@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extraordinary.App", "Extraordinary.App\Extraordinary.App.csproj", "{7AC32CDA-F374-4E7D-A2F3-F3A27A740446}"
 EndProject
@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决�
 		global.json = global.json
 		paket.dependencies = paket.dependencies
 		paket.lock = paket.lock
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Global

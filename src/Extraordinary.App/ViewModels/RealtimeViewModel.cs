@@ -30,8 +30,8 @@ namespace Extraordinary.App.ViewModels
             this.AppName = new ReactiveProperty<string>();
             this.CurrentMD5Version = new ReactiveProperty<string>();
             this.InstallationPath = new ReactiveProperty<string>();
-            this.Self_Starting = new ReactiveProperty<bool>();
-            this.Kill_App = new ReactiveProperty<bool>();
+            this.Self_Starting = new ReactiveProperty<bool>(true);
+            this.Kill_App = new ReactiveProperty<bool>(true);
 
             this.ProgressMaxValue = new ReactiveProperty<long>(long.MaxValue);
             this.ProgressValue = new ReactiveProperty<long>(0);
@@ -54,10 +54,7 @@ namespace Extraordinary.App.ViewModels
                         if (r.Succeed)
                         {
                             Growl.SuccessGlobal(r.ResultValue);
-                            UIHelper.RunInUIThread(pl =>
-                            {
-                                this.Close(this.Self_Starting.Value);
-                            });
+                            this.Close(this.Self_Starting.Value);
                         }
                         else
                         {
@@ -96,7 +93,6 @@ namespace Extraordinary.App.ViewModels
                             MessageBox.Show(initres.ErrorValue);
                         }
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -177,12 +173,10 @@ namespace Extraordinary.App.ViewModels
                         if (r2.Succeed)
                         {
                             Growl.SuccessGlobal("启动成功");
-                            //MessageBox.Show(r1.ErrorValue);
                         }
                         else
                         {
                             MessageBox.Show(r2.ErrorValue);
-
                         }
                     }
                     else
