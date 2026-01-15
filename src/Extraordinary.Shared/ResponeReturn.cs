@@ -1,4 +1,4 @@
-﻿namespace Extraordinary.App.Respone
+﻿namespace Extraordinary.Shared
 {
     public struct ResponeReturn<TResult>
     {

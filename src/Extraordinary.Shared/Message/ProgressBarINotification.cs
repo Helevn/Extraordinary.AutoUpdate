@@ -1,9 +1,8 @@
 ﻿using MediatR;
-using System;
 
-namespace Extraordinary.App.MessageHandler
+namespace Extraordinary.Shared.Message
 {
-    internal class ProgressBarINotification : INotification
+    public class ProgressBarINotification : INotification
     {
         public string Action { get; set; } = "";
         public long MaxValue { get; set; }

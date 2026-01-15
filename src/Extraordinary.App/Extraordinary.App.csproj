@@ -14,6 +14,9 @@
     <Content Include="Resources\favicon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Extraordinary.Services\Extraordinary.Services.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

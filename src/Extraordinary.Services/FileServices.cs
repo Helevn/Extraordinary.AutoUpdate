@@ -1,18 +1,13 @@
-﻿using Extraordinary.App.Config;
-using Extraordinary.App.MessageHandler;
-using Extraordinary.App.Respone;
+﻿using Extraordinary.Shared;
+using Extraordinary.Shared.Message;
 using MediatR;
 using Newtonsoft.Json;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.IO.Compression;
-using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
-using System.Xml.Linq;
 
-namespace Extraordinary.App.Services
+namespace Extraordinary.Services
 {
     public class FileServices : IFileServices
     {

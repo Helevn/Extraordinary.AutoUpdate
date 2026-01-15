@@ -1,5 +1,6 @@
 ﻿using Extraordinary.App.ViewModels;
 using MediatR;
+using Extraordinary.Shared.Message;
 
 namespace Extraordinary.App.MessageHandler
 {

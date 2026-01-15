@@ -1,4 +1,4 @@
-﻿namespace Extraordinary.App.Config
+﻿namespace Extraordinary.Shared
 {
     public class UrlConfig
     {
