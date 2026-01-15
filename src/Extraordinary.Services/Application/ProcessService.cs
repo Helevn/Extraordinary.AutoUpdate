@@ -7,6 +7,7 @@ using MediatR;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace Extraordinary.Services.Application
 {
@@ -178,6 +179,32 @@ namespace Extraordinary.Services.Application
                     await p.WaitForExitAsync(); // possibly with a timeout
                 }
             }
+        }
+
+        public async Task<ResponeReturn<string>> MakeNewVersionConfigAsync(string path, string version, string originConfigName)
+        {
+            //拿文件的MD5信息
+            var r1 = await fileService.GetFileMD5HashAsync(path);
+            if (!r1.Succeed)
+                return r1;
+            var md5info = r1.ResultValue;
+            //另存为新的文件
+            var fileinfo = new FileInfo(path);
+            var fileDir = fileinfo.Directory?.FullName ?? "";
+
+            var zipname = Path.GetFileNameWithoutExtension(path);
+            var zipex = Path.GetExtension(path);
+            var newzip = Path.Combine(fileDir, zipname + "-" + version + "-" + md5info + zipex);
+            var r2 = await fileService.SaveAsAsync(path, newzip);
+            if (!r2.Succeed)
+                return r2;
+
+            var filePath = Path.Combine(fileDir, originConfigName);
+            var config = new OriginConfig { PackageName = Path.GetFileName(newzip), AppVersion = version, AppMD5Version = md5info };
+            var r3 = await fileService.SaveConfigAsync(config, filePath);
+            if (!r3.Succeed)
+                return r3.ErrorValue.ToErrorResult<string>();
+            return fileDir.ToOkResult();
         }
     }
 }

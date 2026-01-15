@@ -67,28 +67,15 @@ namespace Extraordinary.App.ViewModels
             {
                 try
                 {
-                    var r1 = await _fileService.GetFileMD5HashAsync(path);
-                    if (r1.Succeed)
+                    var userinput = UserInputStringDialog.OpenDailog("请输入当前程序的版本号信息");
+                    var res = await _process.MakeNewVersionConfigAsync(path, userinput, this.OriginConfigName);
+                    if (res.Succeed)
                     {
-                        var fileinfo = new FileInfo(path);
-                        var fileDir = fileinfo.Directory?.FullName ?? "";
-                        var fileName = this.OriginConfigName;
-                        var filePath = Path.Combine(fileDir, fileName);
-                        var userinput = UserInputStringDialog.OpenDailog("请输入当前程序的版本号信息");
-                        var config = new OriginConfig { PackageName = fileinfo.Name, AppVersion = userinput, AppMD5Version = r1.ResultValue };
-                        var r2 = await _fileService.SaveConfigAsync(config, filePath);
-                        if (r2.Succeed)
-                        {
-                            Growl.SuccessGlobal("生成成功");
-                        }
-                        else
-                        {
-                            MessageBox.Show(r2.ErrorValue);
-                        }
+                        Growl.SuccessGlobal("新的应用包创建完成");
                     }
                     else
                     {
-                        MessageBox.Show(r1.ErrorValue);
+                        MessageBox.Show(res.ErrorValue);
                     }
                 }
                 catch (Exception ex)

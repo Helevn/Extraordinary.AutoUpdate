@@ -40,5 +40,13 @@ namespace Extraordinary.Services.Application
         /// <param name="name"></param>
         /// <returns></returns>
         Task<ResponeReturn<FileInfo>> FindProcessFileAsync(string dirPath, string name);
+        /// <summary>
+        /// 创建新的软件应用包
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="version"></param>
+        /// <param name="originConfigName"></param>
+        /// <returns></returns>
+        Task<ResponeReturn<string>> MakeNewVersionConfigAsync(string path, string version, string originConfigName);
     }
 }

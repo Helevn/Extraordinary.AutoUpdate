@@ -34,6 +34,25 @@ namespace Extraordinary.Services.Document
             await mediator.Publish(ProgressBarINotification.Max("文件解压"));
             return destdirPath.ToOkResult<string>();
         }
+        public async Task<ResponeReturn<string>> SaveAsAsync(string sourcefilePath, string destfilePath)
+        {
+            try
+            {
+                string fileName = Path.GetFileName(sourcefilePath);
+                string destfileName = Path.Combine(destfilePath);
+
+                using (FileStream sourceStream = new FileStream(sourcefilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+                using (FileStream destStream = new FileStream(destfileName, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+                {
+                    await sourceStream.CopyToAsync(destStream);
+                }
+                return destfileName.ToOkResult<string>();
+            }
+            catch (Exception ex)
+            {
+                return ResponeReturn<string>.NewError($"另存为失败: {ex.Message}");
+            }
+        }
         public async Task<ResponeReturn<string>> GetFileMD5HashAsync(string filePath)
         {
             using FileStream stream = File.OpenRead(filePath);

@@ -39,5 +39,12 @@ namespace Extraordinary.Services.Document
         /// <param name="md5Version"></param>
         /// <returns></returns>
         Task<ResponeReturn<string>> CompareFileAsync(string filePath, string md5Version);
+        /// <summary>
+        /// 文件的另存为
+        /// </summary>
+        /// <param name="sourcefilePath"></param>
+        /// <param name="destfilePath"></param>
+        /// <returns></returns>
+        Task<ResponeReturn<string>> SaveAsAsync(string sourcefilePath, string destfilePath);
     }
 }
