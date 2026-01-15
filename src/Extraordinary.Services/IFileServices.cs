@@ -1,7 +1,6 @@
-﻿using Extraordinary.App.Config;
-using Extraordinary.App.Respone;
+﻿using Extraordinary.Shared;
 
-namespace Extraordinary.App.Services
+namespace Extraordinary.Services
 {
     public interface IFileServices
     {

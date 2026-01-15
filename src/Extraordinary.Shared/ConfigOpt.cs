@@ -1,4 +1,4 @@
-﻿namespace Extraordinary.App.Opt
+﻿namespace Extraordinary.Shared
 {
     public class ConfigOpt
     {

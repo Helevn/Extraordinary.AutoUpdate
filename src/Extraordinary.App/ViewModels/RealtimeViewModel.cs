@@ -1,6 +1,5 @@
-﻿using Extraordinary.App.Config;
-using Extraordinary.App.Opt;
-using Extraordinary.App.Services;
+﻿using Extraordinary.Services;
+using Extraordinary.Shared;
 using HandyControl.Controls;
 using Microsoft.Extensions.Options;
 using Reactive.Bindings;

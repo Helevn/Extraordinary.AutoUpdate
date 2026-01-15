@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Extraordinary.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Extraordinary.App.Services
 {

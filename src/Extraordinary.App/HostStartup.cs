@@ -1,6 +1,6 @@
-﻿using Extraordinary.App.Opt;
-using Extraordinary.App.Services;
+﻿using Extraordinary.App.Services;
 using Extraordinary.App.Views;
+using Extraordinary.Shared;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
