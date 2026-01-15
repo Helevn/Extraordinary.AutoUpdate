@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Reactive.Bindings;
 using System.Windows.Controls;
-using System;
 
 namespace Extraordinary.App.ViewModels
 {
@@ -27,7 +26,7 @@ namespace Extraordinary.App.ViewModels
         /// </summary>
         public ReactiveProperty<Page> CurrentPage { get; set; }
 
-        public Func<string, Page> MapSourceToPage { get; set; }
+        public Func<string, Page>? MapSourceToPage { get; set; }
 
         public void NavigateTo(string source)
         {

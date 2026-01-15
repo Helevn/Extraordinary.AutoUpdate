@@ -1,8 +1,6 @@
 ﻿using Extraordinary.App.ViewModels;
-using System.Windows.Controls;
-using System;
-using System.Windows;
 using Microsoft.Win32;
+using System.Windows.Controls;
 
 namespace Extraordinary.App.Views
 {

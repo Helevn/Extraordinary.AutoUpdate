@@ -22,20 +22,6 @@
         Name="main"
         Background="#F9F9F9"
         LastChildFill="True">
-        <StackPanel DockPanel.Dock="Top">
-            <Grid Height="80">
-                <Grid.Background>
-                    <SolidColorBrush Color="#FF1E3853" />
-                </Grid.Background>
-                <TextBlock
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    FontSize="32px"
-                    FontWeight="Bold"
-                    Foreground="White"
-                    Text="{Binding AppTitle.Value}" />
-            </Grid>
-        </StackPanel>
         <Frame
             Name="navWin"
             Margin="0,0,0,0"
@@ -43,7 +29,7 @@
             VerticalAlignment="Stretch"
             HorizontalContentAlignment="Stretch"
             VerticalContentAlignment="Stretch"
-            Background="#FF1E3853"
+            Background="Transparent"
             DockPanel.Dock="Left"
             NavigationUIVisibility="Hidden"
             ScrollViewer.HorizontalScrollBarVisibility="Visible"

@@ -1,8 +1,5 @@
 ﻿using Extraordinary.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using System;
-using System.Reflection;
 
 namespace Extraordinary.App.Views
 {
@@ -17,6 +14,7 @@ namespace Extraordinary.App.Views
                 vm.MapSourceToPage = url => url switch
                 {
                     UrlDefines.URL_Realtime => sp.GetRequiredService<Realtime>(),
+                    UrlDefines.URL_Params => sp.GetRequiredService<ParamMgmt>(),
                     _ => throw new Exception($"未知的URL={url}"),
                 };
                 return vm;
@@ -25,6 +23,8 @@ namespace Extraordinary.App.Views
             services.AddSingleton<MainWindow>();
             services.AddSingleton<Realtime>();
             services.AddSingleton<RealtimeViewModel>();
+            services.AddSingleton<ParamMgmt>();
+            services.AddSingleton<ParamMgmtVM>();
 
             return services;
         }

@@ -4,158 +4,229 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
-    xmlns:local="clr-namespace:Extraordinary.App.Views"
-    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewmodels="clr-namespace:Extraordinary.App.ViewModels"
-    Title="RealtimePage"
+    Title="实时状态"
     d:DataContext="{d:DesignInstance Type=viewmodels:RealtimeViewModel}"
-    d:DesignHeight="850"
-    d:DesignWidth="1000"
-    Background="White"
+    d:DesignHeight="500"
+    d:DesignWidth="900"
     mc:Ignorable="d">
 
-    <Grid>
-        <Grid.Resources>
-            <Style TargetType="Label">
-                <Setter Property="FontSize" Value="24" />
-                <Setter Property="FontFamily" Value="NSimSun" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="Width" Value="200" />
-            </Style>
-            
-            <Style TargetType="CheckBox">
-                <Setter Property="FontSize" Value="24" />
-                <Setter Property="FontFamily" Value="NSimSun" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-            </Style>
-
-            <Style TargetType="TextBlock">
-                <Setter Property="FontSize" Value="24" />
-                <Setter Property="FontFamily" Value="NSimSun" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="Width" Value="100" />
-            </Style>
-
-            <Style BasedOn="{StaticResource TextBoxBaseStyle}" TargetType="TextBox">
-                <Setter Property="FontSize" Value="24" />
-                <Setter Property="FontFamily" Value="NSimSun" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="MinWidth" Value="400" />
-            </Style>
-        </Grid.Resources>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="4*" />
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="3*" />
-            <RowDefinition Height="1*" />
-            <RowDefinition Height="1*" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel
-            Grid.Row="1"
-            Grid.Column="1"
-            Orientation="Vertical">
-            <StackPanel Orientation="Horizontal">
-                <Label Content="URL地址" />
-                <TextBox x:Name="text_ServerUrl" Text="{Binding ServerUrl.Value}" />
-            </StackPanel>
+        <Border
+            Grid.Row="0"
+            Margin="0,0,0,15"
+            Padding="15,12"
+            Background="{DynamicResource TitleBackground}"
+            CornerRadius="4">
+            <DockPanel LastChildFill="True">
+                <Button
+                    x:Name="btnGotoParamConfig"
+                    VerticalAlignment="Center"
+                    Command="{Binding CmdGotoParamConfig}"
+                    DockPanel.Dock="Right"
+                    Style="{StaticResource ButtonCustom}">
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                        <Path
+                            Width="16"
+                            Height="16"
+                            Margin="0,0,8,0"
+                            Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
+                            Fill="Black"
+                            Stretch="Uniform" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="18"
+                            Text="参数配置" />
+                    </StackPanel>
+                </Button>
+            </DockPanel>
+        </Border>
 
-            <StackPanel Orientation="Horizontal">
-                <Label Content="下载位置" />
-                <TextBox x:Name="text_DownloadPath" Text="{Binding DownloadPath.Value}" />
-            </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="280" />
+            </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Horizontal">
-                <Label Content="程序名称" />
-                <TextBox x:Name="text_AppName" Text="{Binding AppName.Value}" />
-            </StackPanel>
+            <Border
+                Grid.Column="0"
+                Padding="20"
+                Background="White"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="4">
+                <StackPanel>
+                    <TextBlock
+                        Margin="0,0,0,15"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource PrimaryText}"
+                        Text="系统状态" />
 
-            <StackPanel Orientation="Horizontal">
-                <Label Content="当前程序版本" />
-                <TextBox x:Name="text_CurrentMD5Version" Text="{Binding CurrentMD5Version.Value}" />
-            </StackPanel>
+                    <Border
+                        Margin="0,0,0,15"
+                        Padding="15"
+                        Background="{DynamicResource InfoBackground}"
+                        CornerRadius="4">
+                        <StackPanel>
+                            <TextBlock
+                                x:Name="title"
+                                Margin="0,0,0,10"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource PrimaryText}"
+                                Text="{Binding ProgressAction.Value}" />
 
-            <StackPanel Orientation="Horizontal">
-                <Label Content="安装位置" />
-                <TextBox x:Name="text_InstallationPath" Text="{Binding InstallationPath.Value}" />
-            </StackPanel>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Horizontal">
-                <CheckBox x:Name="checkBox_Kill_App" IsChecked="{Binding Kill_App.Value}" Content="更新前终止运行程序"/>
-            </StackPanel>
-            
-            <StackPanel Orientation="Horizontal">
-                <CheckBox x:Name="checkBox_Self_Starting" IsChecked="{Binding Self_Starting.Value}" Content="自动运行"/>
-            </StackPanel>
-        </StackPanel>
+                                <ProgressBar
+                                    Grid.Column="0"
+                                    Height="16"
+                                    Maximum="{Binding ProgressMaxValue.Value}"
+                                    Style="{StaticResource ProgressBarSuccess}"
+                                    Value="{Binding ProgressValue.Value}" />
+                            </Grid>
 
-        <StackPanel Grid.Row="1" Grid.Column="2">
-            <Button
-                Width="100"
-                Height="50"
-                Margin="5"
-                Command="{Binding CmdLoad}"
-                Content="刷新"
-                Style="{StaticResource ButtonWarning}" />
-            <Button
-                Width="100"
-                Height="50"
-                Margin="5"
-                Command="{Binding CmdSave}"
-                Content="保存"
-                Style="{StaticResource ButtonPrimary}" />
-        </StackPanel>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <StackPanel Grid.Row="0" Orientation="Vertical">
+                                    <Label
+                                        Width="120"
+                                        Margin="5"
+                                        HorizontalAlignment="Left"
+                                        Content="当前版本：" />
+                                    <TextBox
+                                        x:Name="text_AppVersion"
+                                        Height="32"
+                                        MinWidth="350"
+                                        Margin="5"
+                                        HorizontalAlignment="Left"
+                                        IsReadOnly="True"
+                                        Text="{Binding AppVersion.Value}" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Orientation="Vertical">
+                                    <Label
+                                        Width="120"
+                                        Margin="5"
+                                        HorizontalAlignment="Left"
+                                        Content="当前MD5版本：" />
+                                    <TextBox
+                                        x:Name="text_AppMD5Version"
+                                        Height="32"
+                                        MinWidth="350"
+                                        Margin="5"
+                                        HorizontalAlignment="Left"
+                                        IsReadOnly="True"
+                                        Text="{Binding AppMD5Version.Value}" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
 
-        <StackPanel
-            Grid.Row="2"
-            Grid.Column="1"
-            Grid.ColumnSpan="2">
-            <ProgressBar
-                Height="40"
-                Maximum="{Binding ProgressMaxValue.Value}"
-                Orientation="Horizontal"
-                Style="{StaticResource ProgressBarInfo}"
-                Value="{Binding ProgressValue.Value}" />
-            <TextBlock x:Name="title" FontSize="24" Text="{Binding ProgressAction.Value}" Style="{StaticResource TextBlockBoldBaseStyle}"></TextBlock>
-        </StackPanel>
+            <Rectangle
+                Grid.Column="1"
+                Width="1"
+                Margin="20,0"
+                Fill="{DynamicResource BorderBrush}" />
 
-        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
-            <Button
-                x:Name="update"
-                Width="100"
-                Margin="5"
-                Height="50"
-                Command="{Binding CmdUpdate}"
-                Content="更新"
-                FontSize="24"
-                Style="{StaticResource ButtonSuccess}" />
-            <Button
-                Margin="5"
-                x:Name="start"
-                Width="100"
-                Height="50"
-                Command="{Binding CmdStart}"
-                Content="启动"
-                FontSize="24"
-                Style="{StaticResource ButtonSuccess}" />
-        </StackPanel>
+            <Border
+                Grid.Column="2"
+                Padding="20"
+                Background="White"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="4">
+                <StackPanel>
+                    <TextBlock
+                        Margin="0,0,0,15"
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource PrimaryText}"
+                        Text="操作面板" />
 
-        <Button
-            x:Name="create"
-            Grid.Row="3"
-            Grid.Column="2"
-            Width="100"
-            Height="50"
-            Click="Create_Click"
-            Content="生成"
-            FontSize="24"
-            Style="{StaticResource ButtonSuccess}" />
+                    <Button
+                        x:Name="update"
+                        Height="45"
+                        Margin="0,0,0,10"
+                        Command="{Binding CmdUpdate}"
+                        Style="{StaticResource ButtonPrimary}">
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                            <Path
+                                Width="20"
+                                Height="20"
+                                Margin="0,0,8,0"
+                                Data="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"
+                                Fill="White"
+                                Stretch="Uniform" />
+                            <TextBlock FontSize="14" Text="检查并更新" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button
+                        x:Name="start"
+                        Height="45"
+                        Margin="0,0,0,10"
+                        Command="{Binding CmdStart}"
+                        Style="{StaticResource ButtonSuccess}">
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                            <Path
+                                Width="20"
+                                Height="20"
+                                Margin="0,0,8,0"
+                                Data="M8,5.14V19.14L19,12.14L8,5.14Z"
+                                Fill="White"
+                                Stretch="Uniform" />
+                            <TextBlock FontSize="14" Text="启动应用程序" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button
+                        x:Name="create"
+                        Height="45"
+                        Click="Create_Click"
+                        Style="{StaticResource ButtonWarning}">
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                            <Path
+                                Width="20"
+                                Height="20"
+                                Margin="0,0,8,0"
+                                Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
+                                Fill="White"
+                                Stretch="Uniform" />
+                            <TextBlock FontSize="14" Text="生成配置文件" />
+                        </StackPanel>
+                    </Button>
+
+                    <Border
+                        Margin="0,20,0,0"
+                        Padding="12"
+                        Background="{DynamicResource LightBackground}"
+                        CornerRadius="4">
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource SecondaryTextBrush}"
+                            Text="• 点击[检查并更新]获取最新版本&#x0a;• 点击[启动应用程序]运行程序&#x0a;• 点击[生成配置文件]创建新配置"
+                            TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Page>
