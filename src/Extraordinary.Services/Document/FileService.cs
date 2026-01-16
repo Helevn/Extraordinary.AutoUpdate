@@ -49,14 +49,15 @@ namespace Extraordinary.Services.Document
             try
             {
                 string fileName = Path.GetFileName(sourcefilePath);
-                string destfileName = Path.Combine(destfilePath);
+                if (File.Exists(destfilePath))
+                    File.Delete(destfilePath);
 
                 using (FileStream sourceStream = new FileStream(sourcefilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
-                using (FileStream destStream = new FileStream(destfileName, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+                using (FileStream destStream = new FileStream(destfilePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
                 {
                     await sourceStream.CopyToAsync(destStream);
                 }
-                return destfileName.ToOkResult<string>();
+                return destfilePath.ToOkResult<string>();
             }
             catch (Exception ex)
             {
