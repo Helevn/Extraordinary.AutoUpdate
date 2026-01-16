@@ -25,6 +25,7 @@ namespace Extraordinary.App.ViewModels
             this.ServerUrl = new ReactiveProperty<string>();
             this.DownloadPath = new ReactiveProperty<string>();
             this.AppName = new ReactiveProperty<string>();
+            this.CurrentVersion = new ReactiveProperty<string>();
             this.CurrentMD5Version = new ReactiveProperty<string>();
             this.InstallationPath = new ReactiveProperty<string>();
             this.Self_Starting = new ReactiveProperty<bool>(true);
@@ -74,6 +75,7 @@ namespace Extraordinary.App.ViewModels
                         ServerUrl = this.ServerUrl.Value,
                         AppName = this.AppName.Value,
                         DownloadPath = this.DownloadPath.Value,
+                        CurrentVersion = this.CurrentVersion.Value,
                         CurrentMD5Version = this.CurrentMD5Version.Value,
                         InstallationPath = this.InstallationPath.Value,
                         Self_Starting = this.Self_Starting.Value,
@@ -97,6 +99,7 @@ namespace Extraordinary.App.ViewModels
             this.ServerUrl.Value = config.ServerUrl;
             this.DownloadPath.Value = config.DownloadPath;
             this.AppName.Value = config.AppName;
+            this.CurrentVersion.Value = config.CurrentVersion;
             this.CurrentMD5Version.Value = config.CurrentMD5Version;
             this.InstallationPath.Value = config.InstallationPath;
             this.Self_Starting.Value = config.Self_Starting;
@@ -110,6 +113,7 @@ namespace Extraordinary.App.ViewModels
         public ReactiveProperty<string> ServerUrl { get; set; }
         public ReactiveProperty<string> DownloadPath { get; set; }
         public ReactiveProperty<string> AppName { get; set; }
+        public ReactiveProperty<string> CurrentVersion { get; set; }
         public ReactiveProperty<string> CurrentMD5Version { get; set; }
         public ReactiveProperty<string> InstallationPath { get; set; }
         public ReactiveProperty<bool> Self_Starting { get; set; }

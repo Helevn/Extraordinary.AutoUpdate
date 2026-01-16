@@ -30,6 +30,9 @@ namespace Extraordinary.Services.Application
             if (!r3.Succeed)
                 return r3.ErrorValue.ToErrorResult<LocalConfig>();
 
+            if (updateConfig.Kill_App)
+                await this.KillProcessAsync(updateConfig.AppName);//杀死当前进程
+
             var urlconfig = r3.ResultValue;
             //通过比对版本和MD5信息判断是否需要更新
             var needUpdate = updateConfig.CurrentMD5Version != urlconfig.AppMD5Version || updateConfig.CurrentVersion != urlconfig.AppVersion;
@@ -44,35 +47,24 @@ namespace Extraordinary.Services.Application
                 if (!r5.Succeed)
                     return r5.ErrorValue.ToErrorResult<LocalConfig>();
 
-                if (updateConfig.Kill_App)
-                    await this.KillProcessAsync(updateConfig.AppName);//杀死当前进程
-
                 var r6 = await fileService.UnCompressAsync(appPath, updateConfig.InstallationPath);//解压
                 if (!r6.Succeed)
                     return r6.ErrorValue.ToErrorResult<LocalConfig>();
-
-                var installPath = r6.ResultValue;
-                var r7 = await this.StartProcessAsync(installPath, updateConfig.AppName);//启动
-                if (!r7.Succeed)
-                    return r7.ErrorValue.ToErrorResult<LocalConfig>();
 
                 updateConfig.CurrentVersion = urlconfig.AppVersion;
                 updateConfig.CurrentMD5Version = urlconfig.AppMD5Version;
                 var r8 = await fileService.SaveConfigAsync(updateConfig, updateConfigFilePath);//保存更新后的数据
                 if (!r8.Succeed)
                     return r8.ErrorValue.ToErrorResult<LocalConfig>();
-                return updateConfig.ToOkResult();
             }
-            else
+            //是否自动启动应用程序
+            if (updateConfig.Self_Starting)
             {
-                if (updateConfig.Kill_App)
-                    await this.KillProcessAsync(updateConfig.AppName);//杀死当前进程
-
                 var r10 = await this.StartProcessAsync(updateConfig.InstallationPath, updateConfig.AppName);//启动
                 if (!r10.Succeed)
                     return r10.ErrorValue.ToErrorResult<LocalConfig>();
-                return updateConfig.ToOkResult();
             }
+            return updateConfig.ToOkResult();
         }
 
         public async Task<ResponeReturn<string>> DownloadAppAsync(string url, string name, string dirPath)
