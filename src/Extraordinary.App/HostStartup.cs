@@ -11,8 +11,7 @@ namespace Extraordinary.App
     {
         public static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
         {
-            services.AddMediatR(typeof(App).Assembly);
-
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(App).Assembly));
             services.AddOptions<BaseConfigOpt>()
                 .Bind(context.Configuration.GetSection("ConfigOpt"));
 
