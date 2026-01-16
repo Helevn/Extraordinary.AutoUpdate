@@ -26,6 +26,16 @@ namespace Extraordinary.Services.Document
                 return "解压目标地址不可为空".ToErrorResult<string>();
             }
 
+            if (Directory.Exists(destdirPath))
+            {
+                Directory.GetDirectories(destdirPath)
+                    .ToList()
+                    .ForEach(dir => Directory.Delete(dir, true));
+                Directory.GetFiles(destdirPath)
+                    .ToList()
+                    .ForEach(file => File.Delete(file));
+            }
+
             if (!Directory.Exists(destdirPath))
                 Directory.CreateDirectory(destdirPath);
 
