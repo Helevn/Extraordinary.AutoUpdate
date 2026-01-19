@@ -19,8 +19,6 @@ nuget Microsoft.Xaml.Behaviors.Wpf 1.1.39
 nuget MahApps.Metro 2.4.9
 nuget MediatR 12.4.1
 nuget MediatR.Extensions.Microsoft.DependencyInjection 11.0.0
-nuget Swashbuckle.AspNetCore 7.2.0
-nuget Swashbuckle.AspNetCore.Newtonsoft 7.2.0
 nuget IronPython 3.4.1
 nuget HandyControl 3.5.1
 nuget ReactiveProperty 9.8.0
@@ -35,3 +33,6 @@ nuget xunit 2.9.3
 nuget Microsoft.NET.Test.Sdk 17.12.0
 nuget xunit.runner.visualstudio 3.0.1
 nuget Xunit.Priority 1.1.6
+nuget Microsoft.AspNetCore.OpenApi 10.0.2
+nuget Swashbuckle.AspNetCore 10.1.0
+nuget Swashbuckle.AspNetCore.Newtonsoft 10.1.0
