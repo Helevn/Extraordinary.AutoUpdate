@@ -210,7 +210,7 @@
                                 Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
                                 Fill="White"
                                 Stretch="Uniform" />
-                            <TextBlock FontSize="14" Text="生成配置文件" />
+                            <TextBlock FontSize="14" Text="应用打包" />
                         </StackPanel>
                     </Button>
 
@@ -222,7 +222,7 @@
                         <TextBlock
                             FontSize="12"
                             Foreground="{DynamicResource SecondaryTextBrush}"
-                            Text="• 点击[检查并更新]获取最新版本&#x0a;• 点击[启动应用程序]运行程序&#x0a;• 点击[生成配置文件]创建新配置"
+                            Text="• 点击[检查并更新]获取最新版本&#x0a;• 点击[启动应用程序]运行程序&#x0a;• 点击[应用打包]创建新配置"
                             TextWrapping="Wrap" />
                     </Border>
                 </StackPanel>
