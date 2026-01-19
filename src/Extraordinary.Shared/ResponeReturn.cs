@@ -12,7 +12,7 @@
         }
         public static ResponeReturn<TResult> NewError(string msg)
         {
-            return new ResponeReturn<TResult> { Succeed = true, ErrorValue = msg };
+            return new ResponeReturn<TResult> { Succeed = false, ErrorValue = msg };
         }
     }
 

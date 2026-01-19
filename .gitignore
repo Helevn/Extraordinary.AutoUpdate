@@ -19,3 +19,4 @@
 paket-files/
 nuget-package-caches/
 .paket/
+dist/

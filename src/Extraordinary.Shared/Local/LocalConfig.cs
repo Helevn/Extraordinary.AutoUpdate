@@ -1,6 +1,9 @@
-﻿namespace Extraordinary.Shared
+﻿namespace Extraordinary.Shared.Local
 {
-    public class UpdateConfig
+    /// <summary>
+    /// 本地配置
+    /// </summary>
+    public class LocalConfig
     {
         /// <summary>
         /// 服务端地址
@@ -14,6 +17,10 @@
         /// 程序名称
         /// </summary>
         public string AppName { get; set; } = "";
+        /// <summary>
+        /// 当前程序版本信息
+        /// </summary>
+        public string CurrentVersion { get; set; } = "";
         /// <summary>
         /// 当前程序的MD5版本信息
         /// </summary>
@@ -32,5 +39,10 @@
         /// 可终止App运行
         /// </summary>
         public bool Kill_App { get; set; } = false;
+
+        /// <summary>
+        /// 高级配置
+        /// </summary>
+        public LocalAdvancedConfig? LocalAdvancedConfig { get; set; }
     }
 }

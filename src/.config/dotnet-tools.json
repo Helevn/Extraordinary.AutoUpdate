@@ -3,13 +3,13 @@
   "isRoot": true,
   "tools": {
     "paket": {
-      "version": "8.0.3",
+      "version": "10.0.0-alpha011",
       "commands": [
         "paket"
       ]
     },
     "powershell": {
-      "version": "6.2.7",
+      "version": "7.5.3",
       "commands": [
         "pwsh"
       ]

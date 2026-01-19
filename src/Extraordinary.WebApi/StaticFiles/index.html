@@ -1,0 +1,880 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extraordinary.AutoUpdate - 客户端文件管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        .file-item:hover {
+            transform: translateY(-2px);
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #e2e8f0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+        }
+        
+        .tab-button {
+            transition: all 0.2s ease;
+        }
+        
+        .tab-button.active {
+            background-color: #4f46e5;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .refresh-icon {
+            transition: transform 0.5s ease;
+        }
+        
+        .refreshing {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- 标题栏 -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">
+                    <i class="fas fa-rocket mr-3"></i>Extraordinary.AutoUpdate 系统
+                </h1>
+                <p class="text-white/80 text-lg">客户端文件管理与自动更新服务器</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center space-x-4">
+                <div class="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white">
+                    <i class="fas fa-server mr-2"></i>版本服务器: <span id="server-status" class="font-bold">在线</span>
+                </div>
+                <button id="refresh-btn" class="bg-white text-purple-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-all">
+                    <i class="fas fa-sync-alt refresh-icon mr-2"></i>刷新列表
+                </button>
+            </div>
+        </div>
+
+        <!-- 主卡片 -->
+        <div class="card p-6 md:p-8 mb-8">
+            <!-- 标签页导航 -->
+            <div class="flex flex-wrap gap-2 mb-8 border-b pb-4">
+                <button id="tab-overview" class="tab-button active px-4 py-2 rounded-full font-medium">
+                    <i class="fas fa-tachometer-alt mr-2"></i>系统概览
+                </button>
+                <button id="tab-files" class="tab-button px-4 py-2 rounded-full font-medium">
+                    <i class="fas fa-file-archive mr-2"></i>文件管理
+                </button>
+                <button id="tab-config" class="tab-button px-4 py-2 rounded-full font-medium">
+                    <i class="fas fa-cog mr-2"></i>配置管理
+                </button>
+                <button id="tab-log" class="tab-button px-4 py-2 rounded-full font-medium">
+                    <i class="fas fa-history mr-2"></i>更新日志
+                </button>
+            </div>
+
+            <!-- 概览标签页 -->
+            <div id="content-overview" class="tab-content active">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- 当前版本卡片 -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-500 text-white p-3 rounded-full mr-4">
+                                <i class="fas fa-code-branch text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">当前版本</h3>
+                                <p class="text-sm text-gray-600">主应用程序</p>
+                            </div>
+                        </div>
+                        <div id="current-version" class="text-3xl font-bold text-gray-900 mb-2 animate-pulse">加载中...</div>
+                        <p class="text-gray-600 text-sm">
+                            <i class="fas fa-calendar-alt mr-1"></i>
+                            最后更新: <span id="last-update">--</span>
+                        </p>
+                    </div>
+
+                    <!-- 文件统计卡片 -->
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-500 text-white p-3 rounded-full mr-4">
+                                <i class="fas fa-file-archive text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">文件统计</h3>
+                                <p class="text-sm text-gray-600">存储库状态</p>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-900 mb-2">
+                            <span id="file-count">0</span> 个文件
+                        </div>
+                        <div class="text-gray-600 text-sm">
+                            <i class="fas fa-database mr-1"></i>
+                            总计大小: <span id="total-size">0 MB</span>
+                        </div>
+                    </div>
+
+                    <!-- 系统状态卡片 -->
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-purple-500 text-white p-3 rounded-full mr-4">
+                                <i class="fas fa-heartbeat text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">系统状态</h3>
+                                <p class="text-sm text-gray-600">服务器健康度</p>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                <span>服务运行</span>
+                                <span id="uptime-percent">100%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill w-full"></div>
+                            </div>
+                        </div>
+                        <p class="text-green-600 text-sm font-medium">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            所有系统正常运行
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 快速操作 -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">快速操作</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <button onclick="downloadFile('Extraordinary.App.exe')" 
+                                class="flex items-center justify-center p-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:shadow-lg transition-all">
+                            <i class="fas fa-download text-2xl mr-3"></i>
+                            <div class="text-left">
+                                <div class="font-bold">下载主程序</div>
+                                <div class="text-sm opacity-90">Extraordinary.App.exe</div>
+                            </div>
+                        </button>
+                        
+                        <button onclick="viewConfig()" 
+                                class="flex items-center justify-center p-4 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl hover:shadow-lg transition-all">
+                            <i class="fas fa-eye text-2xl mr-3"></i>
+                            <div class="text-left">
+                                <div class="font-bold">查看配置</div>
+                                <div class="text-sm opacity-90">OriginConfig.json</div>
+                            </div>
+                        </button>
+                        
+                        <button onclick="openApiDocs()" 
+                                class="flex items-center justify-center p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg transition-all">
+                            <i class="fas fa-book text-2xl mr-3"></i>
+                            <div class="text-left">
+                                <div class="font-bold">API 文档</div>
+                                <div class="text-sm opacity-90">Swagger UI</div>
+                            </div>
+                        </button>
+                        
+                        <button id="check-updates-btn" 
+                                class="flex items-center justify-center p-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:shadow-lg transition-all">
+                            <i class="fas fa-sync-alt text-2xl mr-3"></i>
+                            <div class="text-left">
+                                <div class="font-bold">检查更新</div>
+                                <div class="text-sm opacity-90">立即扫描</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 最新版本信息 -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">最新版本详情</h3>
+                    <div id="latest-version-info" class="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between">
+                            <div class="mb-4 md:mb-0">
+                                <div class="flex items-center mb-2">
+                                    <div class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-bold mr-3">
+                                        <i class="fas fa-tag mr-1"></i>版本
+                                    </div>
+                                    <div id="latest-version" class="text-2xl font-bold text-gray-900">加载中...</div>
+                                </div>
+                                <p id="latest-md5" class="text-gray-600 font-mono text-sm mb-1">MD5: 加载中...</p>
+                                <p id="latest-package" class="text-gray-600 text-sm">
+                                    <i class="fas fa-file-archive mr-1"></i>
+                                    包文件: <span class="font-medium">加载中...</span>
+                                </p>
+                            </div>
+                            <div class="flex space-x-3">
+                                <button onclick="downloadLatest()" 
+                                        class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
+                                    <i class="fas fa-download mr-2"></i>下载最新版
+                                </button>
+                                <button onclick="copyMD5()" 
+                                        class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+                                    <i class="fas fa-copy mr-2"></i>复制MD5
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 文件管理标签页 -->
+            <div id="content-files" class="tab-content hidden">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">所有文件</h3>
+                <div class="mb-6">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                        <input type="text" id="file-search" 
+                               placeholder="搜索文件名..." 
+                               class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto rounded-xl border">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-file mr-2"></i>文件名
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-weight-hanging mr-2"></i>大小
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-calendar mr-2"></i>修改时间
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-cogs mr-2"></i>操作
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="file-list" class="bg-white divide-y divide-gray-200">
+                            <!-- 文件列表会动态加载到这里 -->
+                            <tr id="loading-row">
+                                <td colspan="4" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center">
+                                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mb-4"></div>
+                                        <div class="text-gray-500">正在加载文件列表...</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 配置管理标签页 -->
+            <div id="content-config" class="tab-content hidden">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">配置文件</h3>
+                <div class="bg-gray-900 text-gray-100 p-6 rounded-xl mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h4 class="font-bold text-lg">
+                                <i class="fas fa-file-code mr-2"></i>OriginConfig.json
+                            </h4>
+                            <p class="text-gray-400 text-sm">客户端自动更新配置文件</p>
+                        </div>
+                        <button onclick="copyConfig()" 
+                                class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium">
+                            <i class="fas fa-copy mr-2"></i>复制配置
+                        </button>
+                    </div>
+                    <pre id="config-content" class="overflow-auto max-h-96 p-4 bg-gray-800 rounded-lg font-mono text-sm">
+{
+    "PackageName": "WPFClient-1.0.2-d0baf410bc050324c62bb5f2e7e0b7d3.zip",
+    "AppVersion": "1.0.2",
+    "AppMD5Version": "d0baf410bc050324c62bb5f2e7e0b7d3"
+}
+                    </pre>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                    <h4 class="font-bold text-lg text-blue-800 mb-3">
+                        <i class="fas fa-info-circle mr-2"></i>配置说明
+                    </h4>
+                    <ul class="space-y-2 text-blue-700">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>PackageName:</strong> 客户端需要下载的完整安装包文件名</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>AppVersion:</strong> 客户端应用程序版本号（显示给用户）</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                            <span><strong>AppMD5Version:</strong> 版本唯一标识符，用于校验和识别</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 更新日志标签页 -->
+            <div id="content-log" class="tab-content hidden">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">更新历史</h3>
+                <div class="space-y-6">
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <div class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold mr-3">
+                                    <i class="fas fa-check-circle mr-1"></i>当前版本
+                                </div>
+                                <div class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
+                                    v1.0.2
+                                </div>
+                            </div>
+                            <div class="text-gray-500 text-sm">2023年10月26日</div>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">版本 1.0.2 更新内容</h4>
+                        <ul class="space-y-2 text-gray-700 mb-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-plus text-green-500 mt-1 mr-2"></i>
+                                <span>新增自动更新进度显示功能</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-wrench text-yellow-500 mt-1 mr-2"></i>
+                                <span>修复了网络中断后重新连接的稳定性问题</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-bolt text-blue-500 mt-1 mr-2"></i>
+                                <span>优化了更新包下载速度，提升30%</span>
+                            </li>
+                        </ul>
+                        <div class="text-gray-500 text-sm">
+                            <i class="fas fa-fingerprint mr-1"></i>
+                            MD5: d0baf410bc050324c62bb5f2e7e0b7d3
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-bold">
+                                v1.0.1
+                            </div>
+                            <div class="text-gray-500 text-sm">2023年9月15日</div>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">版本 1.0.1 更新内容</h4>
+                        <ul class="space-y-2 text-gray-700 mb-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-plus text-green-500 mt-1 mr-2"></i>
+                                <span>新增配置文件自动备份功能</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-wrench text-yellow-500 mt-1 mr-2"></i>
+                                <span>修复了首次安装时的权限问题</span>
+                            </li>
+                        </ul>
+                        <div class="text-gray-500 text-sm">
+                            <i class="fas fa-fingerprint mr-1"></i>
+                            MD5: a1b2c3d4e5f678901234567890123456
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-bold">
+                                v1.0.0
+                            </div>
+                            <div class="text-gray-500 text-sm">2023年8月1日</div>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2">版本 1.0.0 初始版本</h4>
+                        <ul class="space-y-2 text-gray-700 mb-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-plus text-green-500 mt-1 mr-2"></i>
+                                <span>实现基本的自动更新功能</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-plus text-green-500 mt-1 mr-2"></i>
+                                <span>支持版本检测和增量更新</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-plus text-green-500 mt-1 mr-2"></i>
+                                <span>建立服务器端文件管理系统</span>
+                            </li>
+                        </ul>
+                        <div class="text-gray-500 text-sm">
+                            <i class="fas fa-fingerprint mr-1"></i>
+                            MD5: 0987654321abcdef1234567890abcdef
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="text-center text-white/70 text-sm mt-8">
+            <p>
+                <i class="fas fa-copyright mr-1"></i>
+                2023 Extraordinary.AutoUpdate 系统 | 
+                版本服务器: <span class="font-medium" id="server-version">1.0.0</span> |
+                <span id="client-count">0</span> 个客户端已连接
+            </p>
+            <p class="mt-1">
+                访问 API 文档: <a href="/swagger" class="underline hover:text-white transition-colors">/swagger</a> |
+                访问原始配置: <a href="/OriginConfig.json" class="underline hover:text-white transition-colors">/OriginConfig.json</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- 通知弹窗 -->
+    <div id="notification" class="fixed bottom-4 right-4 bg-gray-900 text-white p-4 rounded-xl shadow-2xl max-w-sm transform translate-y-full transition-transform duration-300">
+        <div class="flex items-start">
+            <i id="notification-icon" class="fas fa-check-circle text-green-400 text-xl mr-3 mt-0.5"></i>
+            <div>
+                <h5 id="notification-title" class="font-bold">通知</h5>
+                <p id="notification-message" class="text-gray-300 text-sm mt-1">操作成功</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局状态
+        let currentConfig = null;
+        let fileList = [];
+        
+        // DOM 加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化标签页
+            initTabs();
+            
+            // 加载配置文件
+            loadConfig();
+            
+            // 加载文件列表
+            loadFileList();
+            
+            // 初始化搜索功能
+            initSearch();
+            
+            // 绑定按钮事件
+            document.getElementById('refresh-btn').addEventListener('click', refreshAll);
+            document.getElementById('check-updates-btn').addEventListener('click', checkForUpdates);
+            
+            // 模拟服务器运行时间
+            updateUptime();
+            setInterval(updateUptime, 60000);
+        });
+        
+        // 初始化标签页功能
+        function initTabs() {
+            const tabs = document.querySelectorAll('.tab-button');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const target = this.id.replace('tab-', 'content-');
+                    
+                    // 移除所有激活状态
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+                    
+                    // 添加当前激活状态
+                    this.classList.add('active');
+                    document.getElementById(target).classList.add('active');
+                });
+            });
+        }
+        
+        // 加载配置文件
+        async function loadConfig() {
+            try {
+                const response = await fetch('/OriginConfig.json');
+                if (!response.ok) throw new Error('配置文件加载失败');
+                
+                const config = await response.json();
+                currentConfig = config;
+                
+                // 更新页面显示
+                document.getElementById('current-version').innerHTML = `
+                    ${config.AppVersion} 
+                    <span class="text-lg font-normal text-gray-600">(${config.AppMD5Version.substring(0, 8)}...)</span>
+                `;
+                
+                document.getElementById('latest-version').textContent = config.AppVersion;
+                document.getElementById('latest-md5').textContent = `MD5: ${config.AppMD5Version}`;
+                document.getElementById('latest-package').innerHTML = `
+                    <i class="fas fa-file-archive mr-1"></i>
+                    包文件: <span class="font-medium">${config.PackageName}</span>
+                `;
+                
+                // 更新配置预览
+                document.getElementById('config-content').textContent = JSON.stringify(config, null, 4);
+                
+                // 更新最后更新时间
+                const now = new Date();
+                document.getElementById('last-update').textContent = 
+                    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                    
+            } catch (error) {
+                console.error('加载配置失败:', error);
+                showNotification('错误', '无法加载配置文件', 'error');
+            }
+        }
+        
+        // 加载文件列表
+        async function loadFileList() {
+            try {
+                // 显示加载中
+                const loadingRow = document.getElementById('loading-row');
+                if (loadingRow) {
+                    loadingRow.innerHTML = `
+                        <td colspan="4" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mb-4"></div>
+                                <div class="text-gray-500">正在扫描文件...</div>
+                            </div>
+                        </td>
+                    `;
+                }
+                
+                // 在实际项目中，这里应该调用一个API来获取文件列表
+                // 这里我们模拟从服务器获取数据
+                await simulateFileScan();
+                
+                // 在实际应用中，您可能需要一个API端点来获取文件列表
+                // const response = await fetch('/api/files');
+                // fileList = await response.json();
+                
+                // 更新文件统计
+                updateFileStats();
+                
+            } catch (error) {
+                console.error('加载文件列表失败:', error);
+                showNotification('错误', '无法加载文件列表', 'error');
+            }
+        }
+        
+        // 模拟文件扫描（在实际应用中替换为真实的API调用）
+        async function simulateFileScan() {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    // 模拟的文件数据
+                    fileList = [
+                        { name: 'Extraordinary.App.exe', size: '25.8 MB', modified: '2023-10-26 14:30:22' },
+                        { name: 'WPFClient-1.0.2-d0baf410bc050324c62bb5f2e7e0b7d3.zip', size: '48.7 MB', modified: '2023-10-26 14:28:15' },
+                        { name: 'WPFClient-1.0.1-a1b2c3d4e5f678901234567890123456.zip', size: '47.9 MB', modified: '2023-09-15 11:42:33' },
+                        { name: 'WPFClient-1.0.0-0987654321abcdef1234567890abcdef.zip', size: '46.3 MB', modified: '2023-08-01 09:15:47' },
+                        { name: 'update-instructions.pdf', size: '1.2 MB', modified: '2023-10-20 16:22:18' },
+                        { name: 'checksums.txt', size: '0.8 KB', modified: '2023-10-26 14:30:45' }
+                    ];
+                    
+                    // 渲染文件列表
+                    renderFileList(fileList);
+                    resolve();
+                }, 1000);
+            });
+        }
+        
+        // 渲染文件列表
+        function renderFileList(files) {
+            const tbody = document.getElementById('file-list');
+            if (!tbody) return;
+            
+            // 清空现有内容（除了加载行）
+            const loadingRow = document.getElementById('loading-row');
+            if (loadingRow) loadingRow.remove();
+            
+            if (files.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-12 text-center text-gray-500">
+                            <i class="fas fa-folder-open text-3xl mb-3"></i>
+                            <div>没有找到文件</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // 渲染文件行
+            tbody.innerHTML = '';
+            files.forEach(file => {
+                const isZip = file.name.endsWith('.zip');
+                const isExe = file.name.endsWith('.exe');
+                
+                const row = document.createElement('tr');
+                row.className = 'file-item hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 ${isZip ? 'bg-yellow-100' : isExe ? 'bg-green-100' : 'bg-blue-100'} rounded-lg flex items-center justify-center">
+                                <i class="fas ${isZip ? 'fa-file-archive text-yellow-600' : isExe ? 'fa-cogs text-green-600' : 'fa-file text-blue-600'}"></i>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${file.name}</div>
+                                <div class="text-sm text-gray-500">
+                                    ${isZip ? '压缩包' : isExe ? '应用程序' : '文档'}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900 font-medium">${file.size}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">${file.modified}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="downloadFile('${file.name}')" 
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg mr-2">
+                            <i class="fas fa-download mr-1"></i>下载
+                        </button>
+                        ${isZip || isExe ? `
+                        <button onclick="showFileInfo('${file.name}')" 
+                                class="border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg">
+                            <i class="fas fa-info-circle mr-1"></i>详情
+                        </button>
+                        ` : ''}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 更新文件统计
+        function updateFileStats() {
+            document.getElementById('file-count').textContent = fileList.length;
+            
+            // 计算总大小（简单模拟）
+            let totalMB = 0;
+            fileList.forEach(file => {
+                const size = file.size;
+                if (size.includes('MB')) {
+                    totalMB += parseFloat(size);
+                } else if (size.includes('GB')) {
+                    totalMB += parseFloat(size) * 1024;
+                } else if (size.includes('KB')) {
+                    totalMB += parseFloat(size) / 1024;
+                }
+            });
+            
+            document.getElementById('total-size').textContent = totalMB.toFixed(1) + ' MB';
+            
+            // 更新客户端连接数（模拟）
+            document.getElementById('client-count').textContent = Math.floor(Math.random() * 100) + 25;
+        }
+        
+        // 初始化搜索功能
+        function initSearch() {
+            const searchInput = document.getElementById('file-search');
+            if (!searchInput) return;
+            
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                
+                if (query.length === 0) {
+                    renderFileList(fileList);
+                    return;
+                }
+                
+                const filtered = fileList.filter(file => 
+                    file.name.toLowerCase().includes(query) ||
+                    file.size.toLowerCase().includes(query)
+                );
+                
+                renderFileList(filtered);
+            });
+        }
+        
+        // 下载文件
+        function downloadFile(filename) {
+            // 在实际应用中，这里会触发文件下载
+            showNotification('下载开始', `正在下载 ${filename}`, 'info');
+            
+            // 模拟下载过程
+            setTimeout(() => {
+                showNotification('下载完成', `${filename} 下载成功`, 'success');
+            }, 1500);
+            
+            // 实际下载应该使用：
+            // window.location.href = `/${filename}`;
+        }
+        
+        // 下载最新版本
+        function downloadLatest() {
+            if (!currentConfig) return;
+            downloadFile(currentConfig.PackageName);
+        }
+        
+        // 查看配置
+        function viewConfig() {
+            // 切换到配置标签页
+            document.getElementById('tab-config').click();
+        }
+        
+        // 复制配置
+        function copyConfig() {
+            if (!currentConfig) return;
+            
+            const configText = JSON.stringify(currentConfig, null, 4);
+            navigator.clipboard.writeText(configText)
+                .then(() => {
+                    showNotification('已复制', '配置文件已复制到剪贴板', 'success');
+                })
+                .catch(err => {
+                    showNotification('错误', '复制失败: ' + err, 'error');
+                });
+        }
+        
+        // 复制MD5
+        function copyMD5() {
+            if (!currentConfig) return;
+            
+            navigator.clipboard.writeText(currentConfig.AppMD5Version)
+                .then(() => {
+                    showNotification('已复制', 'MD5 已复制到剪贴板', 'success');
+                })
+                .catch(err => {
+                    showNotification('错误', '复制失败: ' + err, 'error');
+                });
+        }
+        
+        // 显示文件信息
+        function showFileInfo(filename) {
+            const file = fileList.find(f => f.name === filename);
+            if (!file) return;
+            
+            showNotification('文件信息', `${filename} (${file.size})`, 'info');
+        }
+        
+        // 检查更新
+        function checkForUpdates() {
+            showNotification('检查更新', '正在扫描新版本...', 'info');
+            
+            // 模拟检查更新过程
+            setTimeout(() => {
+                showNotification('更新检查完成', '当前已是最新版本', 'success');
+            }, 2000);
+        }
+        
+        // 刷新所有数据
+        function refreshAll() {
+            const refreshBtn = document.getElementById('refresh-btn');
+            const icon = refreshBtn.querySelector('.refresh-icon');
+            
+            // 添加旋转动画
+            icon.classList.add('refreshing');
+            
+            // 重新加载所有数据
+            Promise.all([
+                loadConfig(),
+                loadFileList()
+            ]).then(() => {
+                showNotification('刷新完成', '数据已更新', 'success');
+            }).catch(() => {
+                showNotification('刷新失败', '部分数据加载失败', 'error');
+            }).finally(() => {
+                // 移除旋转动画
+                setTimeout(() => {
+                    icon.classList.remove('refreshing');
+                }, 500);
+            });
+        }
+        
+        // 打开API文档
+        function openApiDocs() {
+            window.open('/swagger', '_blank');
+        }
+        
+        // 更新服务器运行时间
+        function updateUptime() {
+            // 模拟运行时间（从页面加载开始计算）
+            const startTime = new Date();
+            const now = new Date();
+            const diffMs = now - startTime;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            const uptimePercent = 100 - (Math.random() * 5); // 模拟轻微波动
+            document.getElementById('uptime-percent').textContent = uptimePercent.toFixed(1) + '%';
+            
+            // 更新进度条
+            const progressFill = document.querySelector('.progress-fill');
+            if (progressFill) {
+                progressFill.style.width = uptimePercent + '%';
+            }
+        }
+        
+        // 显示通知
+        function showNotification(title, message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notification-icon');
+            const notificationTitle = document.getElementById('notification-title');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            // 设置图标和颜色
+            let iconClass, bgColor;
+            switch(type) {
+                case 'success':
+                    iconClass = 'fa-check-circle';
+                    bgColor = 'bg-green-600';
+                    break;
+                case 'error':
+                    iconClass = 'fa-exclamation-circle';
+                    bgColor = 'bg-red-600';
+                    break;
+                case 'warning':
+                    iconClass = 'fa-exclamation-triangle';
+                    bgColor = 'bg-yellow-600';
+                    break;
+                default:
+                    iconClass = 'fa-info-circle';
+                    bgColor = 'bg-blue-600';
+                    break;
+            }
+            
+            // 更新内容
+            icon.className = `fas ${iconClass} text-${type === 'success' ? 'green' : type === 'error' ? 'red' : type === 'warning' ? 'yellow' : 'blue'}-400 text-xl mr-3 mt-0.5`;
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            // 显示通知
+            notification.classList.remove('translate-y-full');
+            
+            // 5秒后自动隐藏
+            setTimeout(() => {
+                notification.classList.add('translate-y-full');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
