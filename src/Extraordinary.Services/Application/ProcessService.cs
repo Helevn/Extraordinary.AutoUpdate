@@ -5,9 +5,8 @@ using Extraordinary.Shared.Message;
 using Extraordinary.Shared.Origin;
 using MediatR;
 using System.Diagnostics;
-using System.IO.Compression;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
+using System.Text.Json;
+using System.Net.Http;
 
 namespace Extraordinary.Services.Application
 {
@@ -18,22 +17,16 @@ namespace Extraordinary.Services.Application
             var r1 = await fileService.GetConfigAsync<LocalConfig>(updateConfigFilePath);//读本地配置文件
             if (!r1.Succeed)
                 return r1.ErrorValue.ToErrorResult<LocalConfig>();
-            var tempPath = Path.GetTempPath();
-
             var updateConfig = r1.ResultValue;
-            var r2 = await this.DownloadAppAsync(updateConfig.ServerUrl, urlConfigName, tempPath);//访问服务端配置文件
-            if (!r2.Succeed)
-                return r2.ErrorValue.ToErrorResult<LocalConfig>();
 
-            var urlconfigFilePath = r2.ResultValue;
-            var r3 = await fileService.GetConfigAsync<OriginConfig>(urlconfigFilePath);
-            if (!r3.Succeed)
-                return r3.ErrorValue.ToErrorResult<LocalConfig>();
+            var remoteResp = await GetRemoteOriginConfigAsync(updateConfig.ServerUrl);
+            if (!remoteResp.Succeed)
+                return remoteResp.ErrorValue.ToErrorResult<LocalConfig>();
+            var urlconfig = remoteResp.ResultValue;
 
             if (updateConfig.Kill_App)
                 await this.KillProcessAsync(updateConfig.AppName);//杀死当前进程
 
-            var urlconfig = r3.ResultValue;
             //通过比对版本和MD5信息判断是否需要更新
             var needUpdate = updateConfig.CurrentMD5Version != urlconfig.AppMD5Version || updateConfig.CurrentVersion != urlconfig.AppVersion;
             if (needUpdate)
@@ -67,6 +60,36 @@ namespace Extraordinary.Services.Application
             return updateConfig.ToOkResult();
         }
 
+        private async Task<ResponeReturn<OriginConfig>> GetRemoteOriginConfigAsync(string serverUrl)
+        {
+            if (string.IsNullOrWhiteSpace(serverUrl))
+                return "服务器下载地址不可为空".ToErrorResult<OriginConfig>();
+
+            try
+            {
+                var baseUrl = serverUrl.TrimEnd('/');
+                var apiUrl = $"{baseUrl}/api/files/version";
+
+                using var http = new HttpClient();
+                using var resp = await http.GetAsync(apiUrl);
+                if (!resp.IsSuccessStatusCode)
+                {
+                    return $"无法从服务端获取版本信息 (Status: {(int)resp.StatusCode})".ToErrorResult<OriginConfig>();
+                }
+
+                var json = await resp.Content.ReadAsStringAsync();
+                var cfg = JsonSerializer.Deserialize<OriginConfig>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if (cfg == null)
+                    return "服务端返回的版本信息格式不正确".ToErrorResult<OriginConfig>();
+
+                return cfg.ToOkResult();
+            }
+            catch (Exception ex)
+            {
+                return $"获取服务端版本信息失败: {ex.Message}".ToErrorResult<OriginConfig>();
+            }
+        }
+
         public async Task<ResponeReturn<string>> DownloadAppAsync(string url, string name, string dirPath)
         {
             await mediator.Publish(ProgressBarINotification.Min("文件下载"));
@@ -89,25 +112,45 @@ namespace Extraordinary.Services.Application
             if (File.Exists(filepath))
                 File.Delete(filepath);
 
-            using var httpClient = new HttpClient();
-            using var response = await httpClient.GetAsync($"{url}/{name}", HttpCompletionOption.ResponseHeadersRead);
-            using var stream = await response.Content.ReadAsStreamAsync();
-            using var fileStream = new FileStream(filepath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
-            var buffer = new byte[8192];
-            int bytesRead = 0;
-            long totalBytesRead = 0;
-            long totalBytes = response.Content.Headers.ContentLength ?? -1;
-            await mediator.Publish(new ProgressBarINotification { Action = "文件下载", MaxValue = totalBytes, Value = 0 });
-            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            try
             {
-                await fileStream.WriteAsync(buffer, 0, bytesRead);
-                totalBytesRead += bytesRead;
-                await mediator.Publish(new ProgressBarINotification { Action = "文件下载", MaxValue = totalBytes, Value = totalBytesRead });
-                //await Task.Delay(1);
+                var baseUrl = url.TrimEnd('/');
+                var downloadUrl = $"{baseUrl}/api/files/download/{Uri.EscapeDataString(name)}";
+
+                using var httpClient = new HttpClient();
+                using var response = await httpClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return $"下载失败，服务端返回状态码 {(int)response.StatusCode}".ToErrorResult<string>();
+                }
+
+                using var stream = await response.Content.ReadAsStreamAsync();
+                using var fileStream = new FileStream(filepath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
+
+                var buffer = new byte[8192];
+                int bytesRead;
+                long totalBytesRead = 0;
+                long totalBytes = response.Content.Headers.ContentLength ?? -1;
+
+                await mediator.Publish(new ProgressBarINotification { Action = "文件下载", MaxValue = totalBytes, Value = 0 });
+
+                while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                {
+                    await fileStream.WriteAsync(buffer, 0, bytesRead);
+                    totalBytesRead += bytesRead;
+                    await mediator.Publish(new ProgressBarINotification { Action = "文件下载", MaxValue = totalBytes, Value = totalBytesRead });
+                }
+
+                await fileStream.FlushAsync();
+                fileStream.Close();
+
+                return filepath.ToOkResult();
             }
-            fileStream.Close();
-            fileStream.Dispose();
-            return filepath.ToOkResult();
+            catch (Exception ex)
+            {
+                return $"下载文件时发生异常: {ex.Message}".ToErrorResult<string>();
+            }
         }
 
         public async Task<ResponeReturn<FileInfo>> FindProcessFileAsync(string dirPath, string name)

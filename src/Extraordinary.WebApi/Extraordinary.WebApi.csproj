@@ -7,8 +7,15 @@
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Extraordinary.Services\Extraordinary.Services.csproj" />
+		<ContentWithTargetPath Include="StaticFiles\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>StaticFiles\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+		</ContentWithTargetPath>
 	</ItemGroup>
 
 	<Import Project="..\.paket\Paket.Restore.targets" />
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Extraordinary.Shared\Extraordinary.Shared.csproj" />
+	</ItemGroup>
 </Project>

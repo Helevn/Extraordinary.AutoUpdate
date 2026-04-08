@@ -1,19 +1,15 @@
 ﻿using Extraordinary.Shared;
-using Extraordinary.Shared.Message;
-using MediatR;
 using Newtonsoft.Json;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Extraordinary.Services.Document
+namespace Extraordinary.WebApi.Document
 {
-    public class FileService(IMediator mediator) : IFileService
+    public class FileService : IFileService
     {
         public async Task<ResponeReturn<string>> UnCompressAsync(string sourcefilePath, string destdirPath)
         {
-            await mediator.Publish(ProgressBarINotification.Min("文件解压"));
-
             if (string.IsNullOrEmpty(sourcefilePath))
             {
                 return "解压源文件地址不可为空".ToErrorResult<string>();
@@ -38,7 +34,6 @@ namespace Extraordinary.Services.Document
 
             ZipFile.ExtractToDirectory(sourcefilePath, destdirPath, true);
 
-            await mediator.Publish(ProgressBarINotification.Max("文件解压"));
             return destdirPath.ToOkResult<string>();
         }
         public async Task<ResponeReturn<string>> SaveAsAsync(string sourcefilePath, string destfilePath)
