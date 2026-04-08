@@ -1,3 +1,4 @@
+using Extraordinary.WebApi;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddServices();
 
 var app = builder.Build();
 
@@ -30,8 +33,6 @@ app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/openapi/v1.json", "V1 Docs");
 });
-
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

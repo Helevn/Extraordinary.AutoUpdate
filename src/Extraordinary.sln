@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extraordinary.App", "Extrao
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{3F69194A-7546-43A6-9CDE-7949D1FE4607}"
 	ProjectSection(SolutionItems) = preProject
+		..\CONTRIBUTING.md = ..\CONTRIBUTING.md
 		.config\dotnet-tools.json = .config\dotnet-tools.json
 		global.json = global.json
 		paket.dependencies = paket.dependencies
